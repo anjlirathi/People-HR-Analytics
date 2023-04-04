@@ -50,3 +50,36 @@ SELECT *
 FROM employees.department
 ORDER BY id
 LIMIT 10;
+
+--Updating Tables to correct date field
+
+
+-- employee
+DROP TABLE IF EXISTS temp_employee;
+CREATE TABLE temp_employee AS
+SELECT * FROM employees.employee;
+
+-- temp department employee
+DROP TABLE IF EXISTS temp_department;
+CREATE TEMP TABLE temp_department AS
+SELECT * FROM employees.department;
+
+-- temp department employee
+DROP TABLE IF EXISTS temp_department_employee;
+CREATE TEMP TABLE temp_department_employee AS
+SELECT * FROM employees.department_employee;
+
+-- department manager
+DROP TABLE IF EXISTS temp_department_manager;
+CREATE TEMP TABLE temp_department_manager AS
+SELECT * FROM employees.department_manager;
+
+-- salary
+DROP TABLE IF EXISTS temp_salary;
+CREATE TEMP TABLE temp_salary AS
+SELECT * FROM employees.salary;
+
+-- title
+DROP TABLE IF EXISTS temp_title;
+CREATE TEMP TABLE temp_title AS
+SELECT * FROM employees.title;
