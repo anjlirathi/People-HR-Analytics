@@ -56,7 +56,7 @@ LIMIT 10;
 
 -- employee
 DROP TABLE IF EXISTS temp_employee;
-CREATE TABLE temp_employee AS
+CREATE TEMP TABLE temp_employee AS
 SELECT * FROM employees.employee;
 
 -- temp department employee
@@ -83,3 +83,65 @@ SELECT * FROM employees.salary;
 DROP TABLE IF EXISTS temp_title;
 CREATE TEMP TABLE temp_title AS
 SELECT * FROM employees.title;
+
+--Updating the date columns in Temp Tables
+
+--Updating temp_employee 
+
+UPDATE temp_employee
+SET hire_date = hire_date + INTERVAL '18 YEARS';
+
+UPDATE temp_employee
+SET birth_date = birth_date + INTERVAL '18 YEARS';
+
+
+--Updating temp_department_employee
+
+UPDATE temp_department_employee
+SET from_date = from_date + INTERVAL '18 YEARS';
+
+UPDATE temp_department_employee
+SET to_date = to_date + INTERVAL '18 YEARS'
+WHERE to_date <> '9999-01-01';
+
+--Updating temp_department_manager
+
+UPDATE temp_department_manager
+SET from_date = from_date + INTERVAL '18 YEARS';
+
+UPDATE temp_department_manager
+SET to_date = to_date + INTERVAL '18 YEARS'
+WHERE to_date <> '9999-01-01';
+
+--Updating temp_salary
+
+UPDATE temp_salary
+SET from_date = from_date + INTERVAL '18 YEARS';
+
+UPDATE temp_salary
+SET to_date = to_date + INTERVAL '18 YEARS'
+WHERE to_date <> '9999-01-01';
+
+
+--Updating temp_title
+
+UPDATE temp_title
+SET from_date = from_date + INTERVAL '18 YEARS';
+
+UPDATE temp_title
+SET to_date = to_date + INTERVAL '18 YEARS'
+WHERE to_date <> '9999-01-01';
+
+
+--Check if the fileds get updated in temp table
+
+SELECT *
+FROM temp_employee
+ORDER BY id
+LIMIT 10;
+--compare
+SELECT *
+FROM employees.employee
+ORDER BY id
+LIMIT 10;
+
