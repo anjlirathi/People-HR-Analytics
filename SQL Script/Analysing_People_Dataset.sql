@@ -320,3 +320,141 @@ FROM v_employees.salary
 WHERE employee_id = '10001'
 ORDER BY from_date DESC
 LIMIT 5;
+
+--Materialized View
+
+--They ran on permanent tables
+--Checking how Materialized View work on a Example table  
+
+--creating Georgi Salary table
+DROP TABLE IF EXISTS georgi_salary CASCADE;
+CREATE TABLE georgi_salary AS
+SELECT * FROM employees.salary
+WHERE employee_id = 10001;
+
+--creating materialized view
+DROP MATERIALIZED VIEW IF EXISTS v_employees.georgi_salary_mv;
+CREATE MATERIALIZED VIEW v_employees.georgi_salary_mv AS
+SELECT 
+  employee_id,
+  amount,
+  from_date + interval '18 years' AS from_date,
+  CASE
+    WHEN to_date <> '9999-01-01' THEN to_date + interval '18 years'
+    ELSE to_date
+    END AS to_date
+FROM employees.salary;
+    
+--Upsert georgy new salary in table 
+UPDATE georgi_salary
+SET to_date = '2003-01-01'
+WHERE to_date = '9999-01-01';
+
+INSERT INTO georgi_salary (employee_id,amount,from_date,to_date)
+VALUES (10001,95000,'2003-01-01','9999-01-01');
+
+--check updates
+SELECT * FROM georgi_salary
+ORDER BY from_date DESC
+LIMIT 10;
+
+--query data
+SELECT * FROM v_employees.georgi_salary_mv
+WHERE employee_id = 10001
+ORDER BY from_date DESC
+LIMIT 5;
+
+--NOTE : need to refresh materialized view to get the updated data
+
+--REFRESH MATERIALIZED VIEW v_employees.georgi_salary_mv; ??doubt
+REFRESH MATERIALIZED VIEW v_employees.georgi_salary_mv;
+
+
+--query data again to see changes
+SELECT * FROM v_employees.georgi_salary_mv
+WHERE employee_id = 10001
+ORDER BY from_date DESC
+LIMIT 10;
+
+
+--Let's create a entire workflow for our dataset using materialized view
+
+-- Create Schema
+
+DROP SCHEMA IF EXISTS mv_employees CASCADE;
+CREATE SCHEMA mv_employees;
+
+--department
+
+DROP MATERIALIZED VIEW IF EXISTS mv_employees.department;
+CREATE MATERIALIZED VIEW  mv_employees.department AS
+SELECT * FROM employees.department;
+
+--employee
+
+DROP MATERIALIZED VIEW IF EXISTS mv_employees.employee;
+CREATE MATERIALIZED VIEW mv_employees.employee AS
+SELECT 
+  id,
+  birth_date + interval '18 years' AS birth_date,
+  first_name,
+  last_name,
+  gender,
+  hire_date + interval '18 years' AS hire_date
+FROM employees.employee;
+
+--department_employee
+
+DROP MATERIALIZED VIEW IF EXISTS mv_employees.department_employee;
+CREATE MATERIALIZED VIEW mv_employees.department_employee AS
+SELECT 
+  employee_id,
+  department_id,
+  from_date + interval '18 years' AS from_date,
+  CASE
+    WHEN to_date <> '9999-01-01' THEN to_date + interval '18 years'
+    ELSE to_date
+    END AS to_date
+FROM employees.department_employee;
+
+--department_manager
+
+DROP MATERIALIZED VIEW IF EXISTS mv_employees.department_manager;
+CREATE MATERIALIZED VIEW mv_employees.department_manager AS
+SELECT 
+  employee_id,
+  department_id,
+  from_date + interval '18 years' AS from_date,
+  CASE
+    WHEN to_date <> '9999-01-01' THEN to_date + interval '18 years'
+    ELSE to_date
+    END AS to_date
+FROM employees.department_manager;
+
+--salary
+
+DROP MATERIALIZED VIEW IF EXISTS mv_employees.salary;
+CREATE MATERIALIZED VIEW mv_employees.salary AS
+SELECT 
+  employee_id,
+  amount,
+  from_date + interval '18 years' AS from_date,
+  CASE
+    WHEN to_date <> '9999-01-01' THEN to_date + interval '18 years'
+    ELSE to_date
+    END AS to_date
+FROM employees.salary;
+
+--title
+
+DROP MATERIALIZED VIEW IF EXISTS mv_employees.title;
+CREATE MATERIALIZED VIEW mv_employees.title AS
+SELECT 
+  employee_id,
+  title,
+  from_date + interval '18 years' AS from_date,
+  CASE
+    WHEN to_date <> '9999-01-01' THEN to_date + interval '18 years'
+    ELSE to_date
+    END AS to_date
+FROM employees.title;
