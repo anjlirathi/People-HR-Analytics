@@ -458,3 +458,82 @@ SELECT
     ELSE to_date
     END AS to_date
 FROM employees.title;
+
+--Comparing Methods/Optimazation
+
+--Explain Plan
+
+EXPLAIN SELECT * FROM employees.salary;
+
+--check data type
+SELECT 
+  table_schema,
+  table_name,
+  column_name,
+  data_type
+FROM information_schema.columns
+WHERE table_schema = 'employees'
+AND table_name = 'salary' ;
+
+--Explain Analyze
+
+EXPLAIN ANALYZE SELECT * FROM employees.salary;
+
+-- SELECT COMPARISION
+
+EXPLAIN ANALYZE SELECT * FROM employees.salary;
+
+EXPLAIN ANALYZE SELECT * FROM adjusted_employees.salary;
+
+EXPLAIN ANALYZE SELECT * FROM v_employees.salary;
+
+EXPLAIN ANALYZE SELECT * FROM mv_employees.salary;
+
+--ADD WHERE FILTER
+
+EXPLAIN ANALYZE SELECT * FROM employees.salary
+WHERE employee_id = 10001;
+
+EXPLAIN ANALYZE SELECT * FROM adjusted_employees.salary
+WHERE employee_id = 10001;
+
+EXPLAIN ANALYZE SELECT * FROM v_employees.salary
+WHERE employee_id = 10001;
+
+EXPLAIN ANALYZE SELECT * FROM mv_employees.salary
+WHERE employee_id = 10001;
+
+-- Create Index
+
+CREATE INDEX ON adjusted_employees.salary(employee_id);
+CREATE INDEX ON mv_employees.salary(employee_id);
+
+EXPLAIN ANALYZE SELECT * FROM adjusted_employees.salary
+WHERE employee_id = 10001;
+
+EXPLAIN ANALYZE SELECT * FROM mv_employees.salary
+WHERE employee_id = 10001;
+
+--Table recreation to see changes after index on adjusted table and materialized view tables
+
+--adjusted table
+DROP TABLE IF EXISTS adjusted_employees.salary;
+CREATE TABLE adjusted_employees.salary AS
+SELECT * FROM employees.salary;
+
+--Update salary table
+UPDATE adjusted_employees.salary
+SET from_date = from_date + interval '18 years';
+
+UPDATE adjusted_employees.salary
+SET to_date = to_date + interval '18 years'
+WHERE to_date <> '9999-01-01';
+
+EXPLAIN ANALYZE SELECT * FROM adjusted_employees.salary
+WHERE employee_id = 10001;
+
+--materialized view
+REFRESH MATERIALIZED VIEW mv_employees.salary;
+
+EXPLAIN ANALYZE SELECT * FROM mv_employees.salary
+WHERE employee_id = 10001;
