@@ -624,3 +624,4 @@ CREATE UNIQUE INDEX ON mv_employees.department_manager USING btree (employee_id,
 CREATE INDEX        ON mv_employees.department_manager USING btree (department_id);
 CREATE UNIQUE INDEX ON mv_employees.salary USING btree (employee_id, from_date);
 CREATE UNIQUE INDEX ON mv_employees.title USING btree (employee_id, title, from_date);
+
