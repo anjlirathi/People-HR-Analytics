@@ -625,3 +625,84 @@ CREATE INDEX        ON mv_employees.department_manager USING btree (department_i
 CREATE UNIQUE INDEX ON mv_employees.salary USING btree (employee_id, from_date);
 CREATE UNIQUE INDEX ON mv_employees.title USING btree (employee_id, title, from_date);
 
+--Current VS Historic Dataset
+
+--Georgi’s Salary Revisited
+
+SELECT *
+FROM mv_employees.salary
+WHERE employee_id = 10001
+ORDER BY from_date DESC
+LIMIT 5;
+
+--What was Georgi’s starting salary at the beginning of 2009?
+SELECT *
+FROM mv_employees.salary
+WHERE employee_id = 10001
+  AND '2009-01-01' BETWEEN from_date and to_date;
+
+--What is Georgi’s current salary?
+SELECT *
+FROM mv_employees.salary
+WHERE employee_id = 10001
+  AND CURRENT_DATE BETWEEN from_date and to_date;
+
+--Georgi received a raise on 23rd of June in 2014 - how much of a percentage increase was it?
+-- LAG method
+WITH cte AS (
+SELECT
+  100 * (amount - LAG(AMOUNT) OVER (ORDER BY from_date))::NUMERIC /
+    LAG(AMOUNT) OVER (ORDER BY from_date) AS percentage_difference
+FROM mv_employees.salary
+WHERE employee_id = 10001
+  AND (
+    from_date = '2014-06-23'
+    OR to_date = '2014-06-23'
+  )
+)
+SELECT *
+FROM cte
+WHERE percentage_difference IS NOT NULL;
+
+-- Cross Join method
+SELECT
+  100 * (t2.after_amount - t1.before_amount) / t1.before_amount::NUMERIC AS percentage_difference
+FROM
+(
+  SELECT
+    amount AS before_amount
+  FROM mv_employees.salary
+  WHERE employee_id = 10001
+    AND to_date = '2014-06-23'
+) AS t1
+CROSS JOIN
+(
+  SELECT
+    amount AS after_amount
+  FROM mv_employees.salary
+  WHERE employee_id = 10001
+    AND from_date = '2014-06-23'
+) AS t2;
+
+--What is the dollar amount difference between Georgi’s salary at date '2012-06-25' and '2020-06-21'
+
+SELECT
+  t2.amount_2020 - t1.amount_2012 AS dollar_difference
+FROM
+(
+  SELECT
+    amount AS amount_2012
+  FROM mv_employees.salary
+  WHERE employee_id = 10001
+    AND '2012-06-25' BETWEEN from_date AND to_date
+) AS t1
+CROSS JOIN
+(
+  SELECT
+    amount AS amount_2020
+  FROM mv_employees.salary
+  WHERE employee_id = 10001
+    AND '2020-06-21' BETWEEN from_date AND to_date
+) AS t2;
+
+--
