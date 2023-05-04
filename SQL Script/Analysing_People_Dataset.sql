@@ -705,4 +705,21 @@ CROSS JOIN
     AND '2020-06-21' BETWEEN from_date AND to_date
 ) AS t2;
 
---
+--Employee Mapping
+
+SELECT * FROM mv_employees.employee
+LIMIT 5;
+--check rows per emp id
+WITH id_cte AS (
+SELECT
+  id,
+  COUNT(*) AS row_count
+FROM mv_employees.employee
+GROUP BY id
+)
+SELECT
+  row_count,
+  COUNT(DISTINCT id) AS employee_count
+FROM id_cte
+GROUP BY row_count
+ORDER BY row_count;
