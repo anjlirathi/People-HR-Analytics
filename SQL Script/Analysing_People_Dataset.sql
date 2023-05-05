@@ -723,3 +723,19 @@ SELECT
 FROM id_cte
 GROUP BY row_count
 ORDER BY row_count;
+
+
+--Valid Data points
+--Salary
+SELECT
+  to_date,
+  COUNT(*) AS record_count,
+  COUNT(DISTINCT employee_id) AS employee_count
+FROM mv_employees.salary
+GROUP BY 1
+ORDER BY 1 DESC
+LIMIT 5;
+
+SELECT
+  COUNT(DISTINCT employee_id) AS distinct_count
+FROM mv_employees.salary;
