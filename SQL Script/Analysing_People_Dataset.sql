@@ -739,3 +739,57 @@ LIMIT 5;
 SELECT
   COUNT(DISTINCT employee_id) AS distinct_count
 FROM mv_employees.salary;
+
+--For each employee who no longer has a valid salary data point - which year had the most employee churn and how many employees left that year?
+
+WITH cte AS
+(
+SELECT
+  employee_id,
+  MAX(to_date) AS final_date
+FROM mv_employees.salary
+GROUP BY employee_id
+)
+SELECT
+  EXTRACT(YEAR FROM final_date) AS churn_year,
+  COUNT(*) AS employee_count
+FROM cte
+WHERE final_date != '9999-01-01'
+GROUP BY churn_year
+ORDER BY employee_count DESC;
+
+--What is the average latest percentage and dollar amount change in salary for each employee who has a valid current salary record?
+WITH lag_cte AS (
+  SELECT
+    employee_id,
+    to_date,
+    amount,
+    LAG(amount) OVER (PARTITION BY employee_id ORDER BY from_date) AS previous_amount
+  FROM mv_employees.salary
+)
+SELECT
+  AVG(
+    100 * (amount - previous_amount) / previous_amount::NUMERIC
+  ) AS average_latest_percentage,
+  AVG(amount - previous_amount) AS average_dollar_change
+FROM lag_cte
+-- keep only valid customers
+WHERE to_date = '9999-01-01';
+
+
+--Department Employee
+
+SELECT * FROM mv_employees.department_employee LIMIT 5;
+
+SELECT
+  to_date,
+  COUNT(*) AS record_count,
+  COUNT(DISTINCT employee_id) AS employee_count
+FROM mv_employees.department_employee
+GROUP BY 1
+ORDER BY 1 DESC
+LIMIT 5;
+
+SELECT
+  COUNT(DISTINCT employee_id) AS distinct_count
+FROM mv_employees.department_employee;
