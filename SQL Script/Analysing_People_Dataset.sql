@@ -793,3 +793,24 @@ LIMIT 5;
 SELECT
   COUNT(DISTINCT employee_id) AS distinct_count
 FROM mv_employees.department_employee;
+
+
+-- Title
+
+
+SELECT * FROM mv_employees.title 
+LIMIT 5;
+
+SELECT 
+  to_date,
+  COUNT (*) AS record_count,
+  COUNT (DISTINCT employee_id) AS employee_count
+FROM mv_employees.title
+GROUP BY 1
+ORDER BY 1 DESC
+LIMIT 5;
+
+SELECT 
+COUNT(DISTINCT employee_id) AS employee_count
+FROM mv_employees.title
+;
