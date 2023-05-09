@@ -814,3 +814,41 @@ SELECT
 COUNT(DISTINCT employee_id) AS employee_count
 FROM mv_employees.title
 ;
+
+--JOIN Historic Tables
+
+--Naive Joins
+DROP TABLE naive_join_table;
+CREATE TEMP TABLE naive_join_table AS
+SELECT
+  employee.id,
+  employee.birth_date,
+  employee.first_name,
+  employee.last_name,
+  employee.gender,
+  employee.hire_date,
+  -- we do not need title.employee_id as employee.id is already included!
+  title.title,
+  title.from_date AS title_from_date,
+  title.to_date AS title_to_date,
+  -- same goes for the title.employee_id column
+  salary.amount,
+  salary.from_date AS salary_from_date,
+  salary.to_date AS salary_to_date,
+  -- same for department_employee.employee_id
+  -- shorten department_employee to dept for the aliases
+  department_employee.department_id,
+  department_employee.from_date AS dept_from_date,
+  department_employee.to_date AS dept_to_date,
+  -- we do not need department.department_id as it is already included!
+  department.dept_name
+FROM mv_employees.employee
+INNER JOIN mv_employees.title
+  ON employee.id = title.employee_id
+INNER JOIN mv_employees.salary
+  ON employee.id = salary.employee_id
+INNER JOIN mv_employees.department_employee
+  ON employee.id = department_employee.employee_id
+-- NOTE: department is joined only to the department_employee table!
+INNER JOIN mv_employees.department
+  ON department_employee.department_id = department.id;
