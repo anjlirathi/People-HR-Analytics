@@ -852,3 +852,7 @@ INNER JOIN mv_employees.department_employee
 -- NOTE: department is joined only to the department_employee table!
 INNER JOIN mv_employees.department
   ON department_employee.department_id = department.id;
+
+  SELECT
+  COUNT(*) AS row_count
+FROM naive_join_table;
