@@ -856,3 +856,19 @@ INNER JOIN mv_employees.department
   SELECT
   COUNT(*) AS row_count
 FROM naive_join_table;
+
+--Inspecting Individuals
+SELECT *
+FROM naive_join_table
+WHERE id = 10001
+ORDER BY salary_to_date DESC;
+
+SELECT *
+FROM naive_join_table
+WHERE id = 11669
+ORDER BY salary_to_date DESC;
+
+SELECT *
+FROM naive_join_table
+WHERE id = 11669
+  AND salary_to_date = '9999-01-01';
