@@ -872,3 +872,15 @@ SELECT *
 FROM naive_join_table
 WHERE id = 11669
   AND salary_to_date = '9999-01-01';
+
+
+--Current Records Only
+
+SELECT *
+FROM naive_join_table
+WHERE id = 11669
+  AND salary_to_date = '9999-01-01'
+  AND title_to_date = '9999-01-01'
+  AND dept_to_date = '9999-01-01';
+
+
