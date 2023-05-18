@@ -937,3 +937,25 @@ WHERE salary.to_date = '9999-01-01'
   SELECT
   COUNT(*) AS row_count
 FROM current_join_table;
+
+
+-- Average salary 
+
+SELECT
+  AVG(amount) AS average_salary
+FROM current_join_table
+WHERE dept_name = 'Production';
+
+SELECT
+  title,
+  AVG(amount) AS avg_salary
+FROM current_join_table
+GROUP BY title
+ORDER BY avg_salary DESC;
+
+SELECT
+  dept_name,
+  AVG(amount) AS avg_salary
+FROM current_join_table
+GROUP BY dept_name
+ORDER BY avg_salary;
