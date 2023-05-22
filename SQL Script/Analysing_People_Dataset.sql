@@ -959,3 +959,22 @@ SELECT
 FROM current_join_table
 GROUP BY dept_name
 ORDER BY avg_salary;
+
+
+--Average Salary Increase
+
+WITH lag_data AS (
+SELECT
+  employee_id,
+  to_date,
+  amount AS current_amount,
+  LAG(amount) OVER (PARTITION BY employee_id ORDER BY to_date) AS previous_amount
+FROM mv_employees.salary
+WHERE employee_id = 10001
+)
+SELECT
+  employee_id,
+  current_amount - previous_amount AS salary_amount_change,
+  100 * (current_amount - previous_amount) / previous_amount::NUMERIC AS salary_pc_change
+FROM lag_data
+WHERE to_date = '9999-01-01';
