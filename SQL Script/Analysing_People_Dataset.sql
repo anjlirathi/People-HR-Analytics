@@ -978,3 +978,6 @@ SELECT
   100 * (current_amount - previous_amount) / previous_amount::NUMERIC AS salary_pc_change
 FROM lag_data
 WHERE to_date = '9999-01-01';
+
+
+
